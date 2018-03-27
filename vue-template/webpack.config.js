@@ -1,6 +1,7 @@
 var path = require('path')
 var webpack = require('webpack')
 var HtmlWebpackPlugin = require('html-webpack-plugin')
+var BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
 const webpackConfig = {
   entry: {
@@ -99,7 +100,8 @@ if (process.env.NODE_ENV === 'production') {
       template: 'src/index.html',
       filename: '../index.html',
       chunks: ['vendor', 'manifest', 'app'],
-    })
+    }),
+    new BundleAnalyzerPlugin(),
   ])
 } else {
   webpackConfig.plugins = (webpackConfig.plugins || []).concat([
@@ -107,7 +109,7 @@ if (process.env.NODE_ENV === 'production') {
       template: 'src/index.html',
       filename: 'index.html',
       chunks: ['vendor', 'manifest', 'app'],
-    })
+    }),
   ])
 }
 
