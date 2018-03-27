@@ -4,14 +4,13 @@ var HtmlWebpackPlugin = require('html-webpack-plugin')
 
 const webpackConfig = {
   entry: {
-    app: [
-      './src/main.js',
-    ],
+    app: './src/main.js',
+    vendor: ['vue', 'vue-router', 'vuex', 'axios', 'qs'],
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
-    publicPath: 'dist/',
-    filename: '[name].js?[hash:8]'
+    publicPath: '',
+    filename: '[name].js?[hash:7]'
   },
   module: {
     rules: [
@@ -39,7 +38,7 @@ const webpackConfig = {
         test: /\.(png|jpg|gif|svg)$/,
         loader: 'file-loader',
         options: {
-          name: '[name].[ext]?[hash]'
+          name: '[name].[ext]?[hash:7]'
         }
       }
     ]
@@ -64,25 +63,24 @@ const webpackConfig = {
     hints: false
   },
   devtool: '#eval-source-map',
-}
-
-// if (process.env.NODE_ENV === 'development') {
-  
-// }
-
-if (process.env.NODE_ENV === 'production') {
-  webpackConfig.devtool = '#source-map'
-  // webpackConfig.devtool = '#eval'
-
-  // http://vue-loader.vuejs.org/en/workflow/production.html
-  webpackConfig.plugins = (webpackConfig.plugins || []).concat([
+  plugins: [
     new webpack.optimize.CommonsChunkPlugin({
       name: 'vendor',
     }),
-    // new webpack.optimize.CommonsChunkPlugin({
-    //   name: 'manifest',
-    //   chunks: ['vendor']
-    // }),
+    new webpack.optimize.CommonsChunkPlugin({
+      name: 'manifest',
+      chunks: ['vendor'],
+    }),
+  ],
+}
+
+if (process.env.NODE_ENV === 'production') {
+  // webpackConfig.devtool = '#source-map'
+  webpackConfig.devtool = false
+  webpackConfig.output.publicPath = 'dist/';
+
+  // http://vue-loader.vuejs.org/en/workflow/production.html
+  webpackConfig.plugins = (webpackConfig.plugins || []).concat([
     new webpack.DefinePlugin({
       'process.env': {
         NODE_ENV: '"production"'
@@ -92,15 +90,15 @@ if (process.env.NODE_ENV === 'production') {
       sourceMap: true,
       compress: {
         warnings: false
-      }
+      },
     }),
     new webpack.LoaderOptionsPlugin({
-      minimize: true
+      minimize: false
     }),
     new HtmlWebpackPlugin({
       template: 'src/index.html',
       filename: '../index.html',
-      chunks: ['vendor', 'manifest', 'app']
+      chunks: ['vendor', 'manifest', 'app'],
     })
   ])
 } else {
@@ -108,8 +106,7 @@ if (process.env.NODE_ENV === 'production') {
     new HtmlWebpackPlugin({
       template: 'src/index.html',
       filename: 'index.html',
-      inject : true,
-      chunks: ['vendor', 'manifest', 'app']
+      chunks: ['vendor', 'manifest', 'app'],
     })
   ])
 }
